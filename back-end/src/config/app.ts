@@ -27,6 +27,7 @@ app.register(fastifyCors, {
   methods: ['GET', 'POST', 'PATCH', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 });
+
 app.register(fastifyJwt, {
   secret: jwtSecret,
   cookie: {
