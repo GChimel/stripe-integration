@@ -9,11 +9,15 @@ export class GenerateRefreshToken {
   }
 
   static validate(token: string) {
-    const payload = verify(
-      token,
-      ENV_VARS.REFRESH_TOKEN_SECRET as string
-    ) as JwtPayload;
+    try {
+      const payload = verify(
+        token,
+        ENV_VARS.REFRESH_TOKEN_SECRET as string
+      ) as JwtPayload;
 
-    console.log(payload);
+      return payload.sub;
+    } catch (error) {
+      return;
+    }
   }
 }
