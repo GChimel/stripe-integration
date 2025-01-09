@@ -1,29 +1,47 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
-import { GenerateRefreshToken } from "../../utils/refreshToken";
+import { EXP_TIME_IN_DAYS } from "../../config/constants";
+import { RefreshToken } from "../../models/refreshToken-models";
 
 export async function refreshToken(req: FastifyRequest, reply: FastifyReply) {
   const validation = z.object({
     refreshToken: z.string(),
   });
 
-  const { refreshToken } = validation.parse(req.body);
+  const { refreshToken: refreshTokenId } = validation.parse(req.body);
 
   try {
-    const userId = GenerateRefreshToken.validate(refreshToken);
+    const refreshToken = await RefreshToken.findById(refreshTokenId);
 
-    if (!userId) {
+    if (!refreshToken) {
       return reply
-        .status(401)
+        .status(404)
         .send({ error: true, message: "Invalid refresh token" });
     }
 
-    const token = await reply.jwtSign({ sub: userId });
-    const newRefreshToken = GenerateRefreshToken.genereate(userId);
+    if (Date.now() > refreshToken.expiresAt!.getTime()) {
+      return reply
+        .status(404)
+        .send({ error: true, message: "Expired refresh token" });
+    }
+
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + EXP_TIME_IN_DAYS);
+
+    const [accessToken, newRefreshToken] = await Promise.all([
+      reply.jwtSign({ sub: refreshToken.userId }),
+      RefreshToken.create({
+        userId: refreshToken.userId,
+        expiresAt,
+        issuedAt: new Date(),
+      }),
+      RefreshToken.findByIdAndDelete(refreshTokenId),
+    ]);
 
     return reply.status(200).send({
-      token,
-      refreshToken: newRefreshToken,
+      error: false,
+      accessToken,
+      refreshToken: newRefreshToken._id,
     });
   } catch (error) {
     throw error;
