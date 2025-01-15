@@ -13,6 +13,7 @@ interface ISignInDTO {
 
 interface ISignInResponse {
   token: string;
+  refreshToken: string;
 }
 
 export class AuthService {
@@ -31,6 +32,17 @@ export class AuthService {
       email,
       password,
     });
+
+    return data;
+  }
+
+  static async refreshToken(refreshToken: string) {
+    const { data } = await httpClient.post<ISignInResponse>(
+      "/session/refresh",
+      {
+        refreshToken,
+      }
+    );
 
     return data;
   }

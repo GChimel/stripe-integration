@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { Link } from "react-router-dom";
 import { z } from "zod";
 import stripe from "../assets/s.svg";
 import { Input } from "../components/input";
@@ -39,7 +40,7 @@ export function SignIn() {
       <div className="flex h-full w-1/2 items-center justify-center">
         <form
           onSubmit={handleSubmit(handleSignIn)}
-          className="flex flex-col justify-between gap-4 shadow-lg rounded-md p-4 h-60 w-60"
+          className="flex flex-col justify-between gap-4 shadow-lg rounded-md p-4 h-72 w-60"
         >
           <h1 className="text-2xl font-bold text-center">Sign in</h1>
 
@@ -50,6 +51,13 @@ export function SignIn() {
             <span className="text-sm">Password:</span>
             <Input type="password" {...register("password")} />
           </section>
+
+          <span className="text-sm">
+            Don&apos;t have an account?{" "}
+            <Link to="/sign-up" className="text-primary font-bold">
+              Sign up
+            </Link>
+          </span>
 
           <button
             disabled={isSubmitting}

@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { Link, useNavigate } from "react-router-dom";
 import { z } from "zod";
 import stripe from "../assets/s.svg";
 import { Input } from "../components/input";
@@ -14,6 +15,8 @@ const validation = z.object({
 type FormData = z.infer<typeof validation>;
 
 export function SignUp() {
+  const navigate = useNavigate();
+
   const {
     register,
     handleSubmit,
@@ -23,9 +26,12 @@ export function SignUp() {
   });
 
   const handleRegister = async (data: FormData) => {
-    const response = await AuthService.signUp(data);
-
-    console.log(response);
+    try {
+      await AuthService.signUp(data);
+      navigate("/sign-in", { replace: true });
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -36,7 +42,7 @@ export function SignUp() {
       <div className="flex h-full w-1/2 items-center justify-center">
         <form
           onSubmit={handleSubmit(handleRegister)}
-          className="flex flex-col justify-between gap-4 shadow-lg rounded-md p-4 h-60 w-60"
+          className="flex flex-col justify-between gap-4 shadow-lg rounded-md p-4 h-80 w-60"
         >
           <h1 className="text-2xl font-bold text-center">Sign up</h1>
 
@@ -50,6 +56,13 @@ export function SignUp() {
             <span className="text-sm">Password:</span>
             <Input type="password" {...register("password")} />
           </section>
+
+          <span className="text-sm">
+            Already have an account?{" "}
+            <Link className="text-primary font-bold" to="/sign-in">
+              Sign in
+            </Link>
+          </span>
 
           <button
             disabled={isSubmitting}

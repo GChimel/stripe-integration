@@ -1,5 +1,6 @@
 import { FastifyInstance } from "fastify";
 import { authenticate } from "../controller/admin/authenticate";
+import { refreshToken } from "../controller/admin/refreshToken";
 import {
   createUser,
   deleteUser,
@@ -8,16 +9,16 @@ import {
   updateUser,
 } from "../controller/admin/user";
 import { Checkout } from "../controller/checkout";
-import { authMiddleware } from "../middlewares/authMiddleware";
 import { WebHook } from "../controller/webHook";
-import { refreshToken } from "../controller/admin/refreshToken";
+import { authMiddleware } from "../middlewares/authMiddleware";
 
 export async function publicRoutes(fastify: FastifyInstance) {
   fastify.post("/session", authenticate);
-  fastify.post('/session/refresh', refreshToken)
+  fastify.post("/session/refresh", refreshToken);
 
   fastify.post("/user", createUser);
 }
+
 export async function privateRoutes(fastify: FastifyInstance) {
   fastify.addHook("onRequest", authMiddleware);
 

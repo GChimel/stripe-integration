@@ -31,7 +31,7 @@ app.register(fastifyCors, {
 app.register(fastifyJwt, {
   secret: jwtSecret,
   sign: {
-    expiresIn: "2d",
+    expiresIn: "10m",
   },
 });
 
